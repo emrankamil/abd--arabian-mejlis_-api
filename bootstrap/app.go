@@ -16,11 +16,12 @@ func App() Application {
 	app := &Application{}
 	app.Env = NewEnv()
 	app.Mongo = NewMongoDatabase(app.Env)
-	app.Redis = redis.NewClient(app.Env.REDISADDR)
+	// app.Redis = redis.NewClient(app.Env.REDISADDR)
+	app.Redis = nil
 	return *app
 }
 
 func (app *Application) Close() {
 	CloseMongoDBConnection(app.Mongo)
-	app.Redis.Close()
+	// app.Redis.Close()
 }

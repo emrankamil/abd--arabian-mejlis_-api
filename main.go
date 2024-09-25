@@ -18,11 +18,11 @@ func main() {
 	// Create text index for search
 	bootstrap.CreateTextIndex(db, domain.ProductsCollection)
 
-	if app.Redis == nil {
-		panic("Redis is not connected")
-	}
-	redisClient := app.Redis
-	defer app.Close()
+	// if app.Redis == nil {
+	// 	panic("Redis is not connected")
+	// }
+	// redisClient := app.Redis
+	// defer app.Close()
 
 	// start the client manager routine
 	clientManager := bootstrap.NewClientManager()
@@ -31,7 +31,7 @@ func main() {
 	timeout := time.Duration(env.ContextTimeout) * time.Second
 
 	router := gin.Default()
-	route.Setup(env, timeout, db, router, redisClient, clientManager)
+	route.Setup(env, timeout, db, router, nil, clientManager)
 
 	// Setup WebSocket routes using Gin
 	// setupRoutes(router)

@@ -14,22 +14,32 @@ func NewMongoDatabase(env *Env) mongo.Client {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	dbHost := env.DBHost
-	dbPort := env.DBPort
-	dbUser := env.DBUser
-	dbPass := env.DBPass
+	// dbHost := env.DBHost
+	// dbPort := env.DBPort
+	// dbUser := env.DBUser
+	// dbPass := env.DBPass
 
-	mongodbURI := fmt.Sprintf("mongodb://%s:%s@%s:%s", dbUser, dbPass, dbHost, dbPort)
+	// mongodbURI := fmt.Sprintf("mongodb://%s:%s@%s:%s", dbUser, dbPass, dbHost, dbPort)
 
-	if dbUser == "" || dbPass == "" {
-		mongodbURI = fmt.Sprintf("mongodb://%s:%s", dbHost, dbPort)
-	}
+	// if dbUser == "" || dbPass == "" {
+	// 	mongodbURI = fmt.Sprintf("mongodb://%s:%s", dbHost, dbPort)
+	// }
 
-	client, err := mongo.NewClient(mongodbURI)
+	// client, err := mongo.NewClient(mongodbURI)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	// err = client.Connect(ctx)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	atlasURI := env.MONGODB_URL
+	client, err := mongo.NewClient(atlasURI)
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	err = client.Connect(ctx)
 	if err != nil {
 		log.Fatal(err)

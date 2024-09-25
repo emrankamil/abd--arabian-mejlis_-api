@@ -1,6 +1,6 @@
 module abduselam-arabianmejlis
 
-go 1.22.5
+go 1.21
 
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
@@ -9,7 +9,6 @@ require (
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/websocket v1.5.3
-	github.com/h2non/bimg v1.1.9
 	github.com/joho/godotenv v1.5.1
 	github.com/stretchr/testify v1.9.0
 	go.mongodb.org/mongo-driver v1.16.1

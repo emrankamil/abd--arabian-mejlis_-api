@@ -37,7 +37,10 @@ func (r *productRepository) CreateProduct(c context.Context, product *domain.Pro
     // Marshal the product to JSON for caching
     productData, err := json.Marshal(product)
     if err == nil {
-        _ = r.RedisClient.Set(c, product.ID.Hex(), productData, 0) 
+		if r.RedisClient != nil {
+			_ = r.RedisClient.Set(c, product.ID.Hex(), productData, 0) 
+		}
+        
     }
 
     return *product, nil
@@ -46,12 +49,14 @@ func (r *productRepository) CreateProduct(c context.Context, product *domain.Pro
 func (r *productRepository) GetProductByID(c context.Context, id string) (*domain.Product, bool, error) {
 
 	var product domain.Product
-	cachedProduct, err := r.RedisClient.Get(c, id).Bytes()
-    if err == nil {
-        if err := json.Unmarshal(cachedProduct, &product); err == nil {
-            return &product, true, nil
-        }
-    }
+	if r.RedisClient != nil {
+		cachedProduct, err := r.RedisClient.Get(c, id).Bytes()
+		if err == nil {
+			if err := json.Unmarshal(cachedProduct, &product); err == nil {
+				return &product, true, nil
+			}
+		}
+	}
 
     collection := r.database.Collection(r.collection)
     objectID, err := primitive.ObjectIDFromHex(id)
@@ -69,8 +74,10 @@ func (r *productRepository) GetProductByID(c context.Context, id string) (*domai
 
     productData, err := json.Marshal(&product)
     if err == nil {
-        _ = r.RedisClient.Set(c, id, productData, 0)
-    }
+		if r.RedisClient != nil {
+        	_ = r.RedisClient.Set(c, id, productData, 0)
+		}
+    }	
 
     return &product, false, nil
 }
@@ -111,7 +118,9 @@ func (r *productRepository) UpdateProduct(c context.Context, product *domain.Pro
 		bson.M{"_id": product.ID},
 		bson.M{"$set": product},
 	)
-	r.RedisClient.Del(c, product.ID.Hex())
+	if r.RedisClient != nil {
+		r.RedisClient.Del(c, product.ID.Hex())
+	}
 	return err
 }
 
@@ -127,7 +136,10 @@ func (r *productRepository) DeleteProduct(c context.Context, id string) error {
 	if err != nil {
 		return err
 	}
-	err = r.RedisClient.Del(c, id)
+	
+	if r.RedisClient != nil {
+		err = r.RedisClient.Del(c, id)
+	}
 	return err
 }
 
