@@ -6,6 +6,8 @@ import (
 	"abduselam-arabianmejlis/domain"
 	"time"
 
+	"github.com/gin-contrib/cors"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -31,6 +33,17 @@ func main() {
 	timeout := time.Duration(env.ContextTimeout) * time.Second
 
 	router := gin.Default()
+
+	config := cors.DefaultConfig()
+    config.AllowAllOrigins = true
+    config.AllowMethods = []string{"POST", "GET", "PUT", "OPTIONS", "DELETE"}
+    config.AllowHeaders = []string{"Origin", "Content-Type", "Authorization", "Accept", "User-Agent", "Cache-Control", "Pragma"}
+    config.ExposeHeaders = []string{"Content-Length"}
+    config.AllowCredentials = true
+    config.MaxAge = 12 * time.Hour
+
+    router.Use(cors.New(config))
+
 	route.Setup(env, timeout, db, router, nil, clientManager)
 
 	// Setup WebSocket routes using Gin
