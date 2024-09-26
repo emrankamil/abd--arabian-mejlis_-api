@@ -18,6 +18,7 @@ func Setup(env *bootstrap.Env, timeout time.Duration, db mongo.Database, gin *gi
 	NewFogetPWRouter(env, timeout, db, publicRouter)
 	NewRefreshTokenRouter(env, timeout, db, publicRouter)
 	NewProductRouter(env, timeout, db, publicRouter, redisClient)
+	NewImageUploadRouter(env, timeout, db, publicRouter)
 
 	protectedRouter := gin.Group("")
 	protectedRouter.Use(middleware.JwtAuthMiddleware(env.AccessTokenSecret))
@@ -28,4 +29,7 @@ func Setup(env *bootstrap.Env, timeout time.Duration, db mongo.Database, gin *gi
 	//websocket router
 	wsRouter := gin.Group("")
 	NewChatRouter(env, timeout, db, cm, wsRouter)
+
+	// static file server
+	gin.Static("/uploads", "./uploads")
 }

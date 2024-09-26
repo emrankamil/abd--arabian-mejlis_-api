@@ -32,6 +32,8 @@ func main() {
 
 	timeout := time.Duration(env.ContextTimeout) * time.Second
 
+	// gin.SetMode(gin.ReleaseMode)
+	
 	router := gin.Default()
 
 	config := cors.DefaultConfig()
