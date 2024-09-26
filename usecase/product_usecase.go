@@ -93,7 +93,7 @@ func (pu *productUseCase) UploadProductImages(ctx context.Context, files map[str
             return nil, err
         }
 
-		filepath := fmt.Sprintf("http://%s/%s/%s", serverAdress, domain.ImageUploadFolder, filename)
+		filepath := fmt.Sprintf("https://drunk-damara-emex-3731a176.koyeb.app/%s/%s", domain.ImageUploadFolder, filename)
 		// Add the file path to the result
 		paths = append(paths, filepath)
 	}
