@@ -73,7 +73,7 @@ func (pu *productUseCase) SearchProducts(ctx context.Context, keyword string) ([
 	return pu.productRepo.SearchProducts(ctx, keyword)
 }
 
-func (pu *productUseCase) UploadProductImages(ctx context.Context, files map[string]io.Reader, serverAdress string) ([]string, error) {
+func (pu *productUseCase) UploadProductImages(ctx context.Context, files map[string]io.Reader, hostAddress string) ([]string, error) {
 	var paths []string
 
 	// Ensure the uploads directory exists
@@ -93,7 +93,7 @@ func (pu *productUseCase) UploadProductImages(ctx context.Context, files map[str
             return nil, err
         }
 
-		filepath := fmt.Sprintf("https://drunk-damara-emex-3731a176.koyeb.app/%s/%s", domain.ImageUploadFolder, filename)
+		filepath := fmt.Sprintf("https://%s/%s/%s", hostAddress, domain.ImageUploadFolder, filename)
 		// Add the file path to the result
 		paths = append(paths, filepath)
 	}

@@ -12,6 +12,7 @@ import (
 type Env struct {
 	AppEnv                 string `mapstructure:"APP_ENV"`
 	ServerAddress          string `mapstructure:"SERVER_ADDRESS"`
+	HostAddress            string `mapstructure:"HOST_ADDRESS"`
 	ContextTimeout         int    `mapstructure:"CONTEXT_TIMEOUT"`
 	MONGODB_URL			   string `mapstructure:"MONGODB_URL"`
 	DBHost                 string `mapstructure:"DB_HOST"`

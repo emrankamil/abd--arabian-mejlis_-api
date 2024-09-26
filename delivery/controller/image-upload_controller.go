@@ -48,7 +48,7 @@ func (uc *UploadController) HandleUpload(c *gin.Context) {
 		fileMap[fileHeader.Filename] = file
 	}
 
-	paths, err := uc.productUseCase.UploadProductImages(c, fileMap, uc.Env.ServerAddress)
+	paths, err := uc.productUseCase.UploadProductImages(c, fileMap, uc.Env.HostAddress)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to upload images"})
 		return
