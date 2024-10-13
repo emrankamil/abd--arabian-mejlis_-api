@@ -24,6 +24,6 @@ func NewProductRouter(env *bootstrap.Env, timeout time.Duration, db mongo.Databa
 	group.PUT("/products/:id", productController.UpdateProduct)
 	group.DELETE("/products/:id", productController.DeleteProduct)
 	group.GET("/products/search", productController.SearchProducts)
-	group.POST("/products/:id/like", productController.LikeProduct)
-	group.POST("/products/:id/unlike", productController.UnlikeProduct)
+	group.GET("/products/:id/like", productController.LikeProduct)
+	group.GET("/products/:id/unlike", productController.UnlikeProduct)
 }

@@ -3,6 +3,7 @@ package controller
 import (
 	"abduselam-arabianmejlis/domain"
 	"abduselam-arabianmejlis/redis"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -13,13 +14,13 @@ import (
 
 type ProductController struct {
 	ProductUseCase domain.ProductUseCase
-	RedisClient redis.Client
+	RedisClient    redis.Client
 }
 
 func NewProductController(pu domain.ProductUseCase, redisClient redis.Client) *ProductController {
 	return &ProductController{
 		ProductUseCase: pu,
-		RedisClient: redisClient,
+		RedisClient:    redisClient,
 	}
 }
 
@@ -34,6 +35,8 @@ func (pc *ProductController) CreateProduct(c *gin.Context) {
 	product.CreatedAt = time.Now()
 	product.UpdatedAt = time.Now()
 	product.IsAvailable = true
+	product.Views = 13
+	product.Likes = 8
 
 	createdProduct, err := pc.ProductUseCase.CreateProduct(c, &product)
 
@@ -42,34 +45,33 @@ func (pc *ProductController) CreateProduct(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, domain.SuccessResponse{Success: true, Message: "Product Created Successfully", Data: createdProduct})
+	c.JSON(http.StatusCreated, domain.SuccessResponse{Success: true, Data: createdProduct})
 }
 
 func (pc *ProductController) GetProductByID(c *gin.Context) {
 	id := c.Param("id")
-	
-    product, fromCache, err := pc.ProductUseCase.GetProductByID(c, id)
-    if err != nil {
-        c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Error: err.Error()})
-        return
-    }
+
+	product, fromCache, err := pc.ProductUseCase.GetProductByID(c, id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Error: err.Error()})
+		return
+	}
 	if product == nil {
-		c.JSON(http.StatusNotFound, domain.SuccessResponse{Success: false, Message: "Product Not Found", Data: nil})
+		c.JSON(http.StatusNotFound, domain.SuccessResponse{Success: false, Data: nil})
 		return
 	}
 
-    message := "Product Fetched Successfully"
-    if fromCache {
-        message = "Product Fetched From Cache Successfully"
-    }
+	if fromCache {
+		fmt.Println("from cache")
+	}
 
-    c.JSON(http.StatusOK, domain.SuccessResponse{Success: true, Message: message, Data: product})
+	c.JSON(http.StatusOK, domain.SuccessResponse{Success: true, Data: product})
 
 }
 
 func (pc *ProductController) GetProducts(c *gin.Context) {
 	var req domain.GetProductsRequest
-	
+
 	if err := c.BindQuery(&req); err != nil {
 		c.JSON(http.StatusBadRequest, domain.ErrorResponse{Error: "Invalid Request"})
 		return
@@ -82,17 +84,18 @@ func (pc *ProductController) GetProducts(c *gin.Context) {
 		filter["category"] = req.Category
 	}
 	if req.Tag != "" {
-		filter["tags"] =  bson.M{"$in": []string{req.Tag}}
+		filter["tags"] = bson.M{"$in": []string{req.Tag}}
 	}
 
-	products, err := pc.ProductUseCase.GetProducts(c, &req.Pagination, filter)
-    if err != nil {
-        c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Error: err.Error()})
-        return
-    }
+	fmt.Println(req.Pagination, filter)
+	products, totalCount, err := pc.ProductUseCase.GetProducts(c, &req.Pagination, filter)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Error: err.Error()})
+		return
+	}
 
-    c.JSON(http.StatusOK, domain.SuccessResponse{Success: true, Message: "Products Fetched Successfully", Data: products})
-	
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": products, "total_count": totalCount})
+
 }
 
 func (pc *ProductController) UpdateProduct(c *gin.Context) {
@@ -104,7 +107,7 @@ func (pc *ProductController) UpdateProduct(c *gin.Context) {
 		return
 	}
 	err = pc.ProductUseCase.UpdateProduct(c, &product, id)
-	
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Error: err.Error()})
 		return
@@ -116,9 +119,9 @@ func (pc *ProductController) DeleteProduct(c *gin.Context) {
 	id := c.Param("id")
 
 	product, _, err := pc.ProductUseCase.GetProductByID(c, id)
-	if product == nil{
+	if product == nil {
 		c.JSON(http.StatusNotFound, gin.H{"message": "Product Not Found"})
-		return	
+		return
 	}
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Error: err.Error()})
@@ -133,27 +136,64 @@ func (pc *ProductController) DeleteProduct(c *gin.Context) {
 }
 
 func (pc *ProductController) LikeProduct(c *gin.Context) {
-	productID := c.Param("product_id")
-	userID := c.Param("user_id")
-	err := pc.ProductUseCase.LikeProduct(c, productID, userID)
+	// productID := c.Param("product_id")
+	// userID := c.Param("user_id")
+	// err := pc.ProductUseCase.LikeProduct(c, productID, userID)
+	// if err != nil {
+	// 	c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Error: err.Error()})
+	// 	return
+	// }
+	// c.JSON(http.StatusOK, gin.H{"message": "Product Liked Successfully"})
+	id := c.Param("id")
+	product, _, err := pc.ProductUseCase.GetProductByID(c, id)
+	if product == nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Product Not Found"})
+		return
+	}
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Error: err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "Product Liked Successfully"})
-}
-
-func (pc *ProductController) UnlikeProduct(c *gin.Context) {
-	productID := c.Param("product_id")
-	userID := c.Param("user_id")
-
-	err := pc.ProductUseCase.UnlikeProduct(c, productID, userID)
+	product.Likes++
+	err = pc.ProductUseCase.UpdateProduct(c, product, id)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Error: err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Product unliked successfully"})
+	c.JSON(http.StatusOK, gin.H{"message": "Product Liked Successfully", "likes": product.Likes, "success": true})
+
+}
+
+func (pc *ProductController) UnlikeProduct(c *gin.Context) {
+	// productID := c.Param("product_id")
+	// userID := c.Param("user_id")
+
+	// err := pc.ProductUseCase.UnlikeProduct(c, productID, userID)
+	// if err != nil {
+	// 	c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	// 	return
+	// }
+
+	// c.JSON(http.StatusOK, gin.H{"message": "Product unliked successfully"})
+	id := c.Param("id")
+	product, _, err := pc.ProductUseCase.GetProductByID(c, id)
+	if product == nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Product Not Found"})
+		return
+	}
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Error: err.Error()})
+		return
+	}
+	product.Likes--
+	err = pc.ProductUseCase.UpdateProduct(c, product, id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Error: err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Product UnLiked Successfully", "likes": product.Likes, "success": true})
 }
 
 func (pc *ProductController) SearchProducts(c *gin.Context) {
@@ -164,8 +204,8 @@ func (pc *ProductController) SearchProducts(c *gin.Context) {
 		return
 	}
 	if products == nil {
-		c.JSON(http.StatusOK, gin.H{"message": "No products found"})
+		c.JSON(http.StatusOK, gin.H{"sucess": false, "data": ""})
 		return
 	}
-	c.JSON(http.StatusOK, products)
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": products})
 }

@@ -72,7 +72,7 @@ func (lc *LoginController) Login(c *gin.Context) {
 		RefreshToken: refreshToken,
 	}
 
-	c.JSON(http.StatusOK, domain.SuccessResponse{Success: true, Message: "login successful", Data: loginResponse})
+	c.JSON(http.StatusOK, domain.SuccessResponse{Success: true, Data: loginResponse})
 }
 
 func (lc *LoginController) Logout(c *gin.Context) {
@@ -88,5 +88,5 @@ func (lc *LoginController) Logout(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, domain.SuccessResponse{Success: true, Message: "logout successful"})
+	c.JSON(http.StatusOK, domain.SuccessResponse{Success: true})
 }

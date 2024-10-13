@@ -44,7 +44,7 @@ func (pc *PromoteController) PromoteUser(c *gin.Context) {
 			return
 	}
 
-	c.JSON(http.StatusOK, domain.SuccessResponse{Success: true, Message: "user promoted to ADMIN"})
+	c.JSON(http.StatusOK, domain.SuccessResponse{Success: true})
 }
 
 
@@ -71,5 +71,5 @@ func (pc *PromoteController) DemoteUser(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Error: err.Error()})
 			return
 	}
-	c.JSON(http.StatusOK, domain.SuccessResponse{Success: true, Message: "user demoted to USER"})
+	c.JSON(http.StatusOK, domain.SuccessResponse{Success: true})
 }

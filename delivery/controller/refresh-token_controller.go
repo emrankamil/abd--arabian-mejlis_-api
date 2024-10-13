@@ -67,5 +67,5 @@ func (rc *RefreshTokenController) RefreshTokenRequest(c *gin.Context) {
 		AccessToken:  accessToken,
 	}
 
-	c.JSON(http.StatusOK, domain.SuccessResponse{Success: true, Message: "access token refresh successful", Data: refreshTokenResponse})
+	c.JSON(http.StatusOK, domain.SuccessResponse{Success: true, Data: refreshTokenResponse})
 }

@@ -18,6 +18,7 @@ func Setup(env *bootstrap.Env, timeout time.Duration, db mongo.Database, gin *gi
 	NewFogetPWRouter(env, timeout, db, publicRouter)
 	NewRefreshTokenRouter(env, timeout, db, publicRouter)
 	NewProductRouter(env, timeout, db, publicRouter, redisClient)
+	NewOrderRouter(env, timeout, db, publicRouter)
 	NewImageUploadRouter(env, timeout, db, publicRouter)
 
 	protectedRouter := gin.Group("")

@@ -43,7 +43,7 @@ func (fpc *ForgetPWController) ForgetPW(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, domain.SuccessResponse{Success: true, Message: "reset password request accepted"})
+	c.JSON(http.StatusOK, domain.SuccessResponse{Success: true})
 }
 
 func (fpc *ForgetPWController) ResetPW(c *gin.Context) {
@@ -97,5 +97,5 @@ func (fpc *ForgetPWController) ResetPW(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, domain.SuccessResponse{Success: true, Message: "password reset successful"})
+	c.JSON(http.StatusOK, domain.SuccessResponse{Success: true})
 }
