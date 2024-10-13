@@ -1,0 +1,9 @@
+# Common Ignored Files
+.DS_Store
+.env
+.vscode
+.idea/
+*.pem
+
+# Go Ignore
+bin/
