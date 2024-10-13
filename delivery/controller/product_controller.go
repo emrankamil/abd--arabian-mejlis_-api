@@ -87,7 +87,6 @@ func (pc *ProductController) GetProducts(c *gin.Context) {
 		filter["tags"] = bson.M{"$in": []string{req.Tag}}
 	}
 
-	fmt.Println(req.Pagination, filter)
 	products, totalCount, err := pc.ProductUseCase.GetProducts(c, &req.Pagination, filter)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Error: err.Error()})
