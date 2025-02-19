@@ -59,9 +59,10 @@ func (su *signupUsecase) Create(c context.Context, user *domain.User) error {
 		return err
 	}
 
-	msg := su.emailService.EmailVerificationMsg(user.Email, user.Name, code)
+	// msg := su.emailService.EmailVerificationMsg(user.Email, user.Name, code)
 
-	return su.emailService.SendEmail(user.Email, msg)
+	// return su.emailService.SendEmail(user.Email, msg)
+	return nil
 	
 }
 
